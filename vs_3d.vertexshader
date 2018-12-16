@@ -1,0 +1,29 @@
+#version 330 core
+
+layout(location = 0) in float x; 
+layout(location = 1) in float y; 
+layout(location = 2) in float h; 
+out vec3 oColor;
+
+uniform mat4 u_transform;
+uniform mat4 u_model;
+uniform float u_R;
+
+const float PI = 3.1415926535897932384626433832795;
+const float PI_2 = PI*0.5;
+
+void main(){
+    if      (h < 0   )  oColor = vec3(0.,       1.,       0.);//->green
+    else if (h < 500 )  oColor = vec3(0.,       h/500,    0.);//->green
+    else if (h < 1000)  oColor = vec3(h/500-1,  1.,       0.);//->yellow
+    else if (h < 2000)  oColor = vec3(1.,       2.-h/1000,0.);//->red
+    else                oColor = vec3(1.,       h/2000-1 ,h/2000-1);  //->white
+
+    vec4 pos = u_model * vec4(x, y, 0, 1.0);
+    float a = -PI + (pos.x + 1)*PI;
+    float b = -PI_2 + (pos.y + 1)*PI_2;
+    vec3 v = normalize(vec3(cos(a)*cos(b), sin(b), sin(a)*cos(b)));
+    v = v * (u_R+h/100000);
+    gl_Position = u_transform *vec4(v.x, v.y, v.z, 1.0);
+}
+
